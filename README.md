@@ -235,3 +235,240 @@ Several techniques are available to solve different types of problems in AI. The
 3. Interpretability: Many AI models, especially deep learning, lack transparency, making it hard to understand how decisions are made.
 4. Ethics and Bias: AI can conserve biases in data which leads to unfair or unethical outcomes, ensuring fairness is a key challenge.
 ```
+
+## 3. Search Algorithms in AI
+Search algorithms in AI help find solutions by exploring possible paths or options in a problem space. AI uses them in tasks like pathfinding, decision making and game playing. These algorithms work by searching through a set of possibilities to reach a goal, either blindly without extra information or with guidance using heuristics.
+
+### `Types of search algorithms`
+There are mainly 2 types of search algorithms i.e Uninformed Search Algorithms and Informed Search Algorithms.
+
+#### `1. Uninformed Search Algorithms :` 
+Uninformed search algorithms is also known as blind search algorithms, are a class of search algorithms that do not use any domain-specific knowledge about the problem being solved.
+```bash
+1. Uninformed search algorithms rely on the information provided in the problem definition, such as the initial state, actions available in each state, and the goal state.
+
+2. These are called "blind" because they do not have a heuristic function to guide the search towards the goal instead, they explore the search space systematically.
+
+3. Uninformed search algorithms provide basic search strategies for exploring problem spaces where no additional knowledge is available beyond the problem definition.
+
+4. These algorithms are important for solving a wide range of problems in AI, such as pathfinding, puzzle solving, and state-space search.
+```
+<b> Types of Uninformed Search Algorithms </b>
+
+`1. Breadth-First Search (BFS) :` Breadth First Search (BFS) is a graph traversal method used to visit nodes level by level. It starts from a source node and first visits all its neighboring nodes. Then, it visits the neighbors of those nodes, continuing until all reachable nodes are explored. BFS uses a Queue (FIFO) to store nodes and helps find the shortest path in an unweighted graph.
+```bash
+1. Breadth First Search (BFS) visits the nearest vertices first and explores the graph level by level. It is different from Depth First Search (DFS), which explores one path deeply before moving to another path.
+
+2. Many popular graph algorithms such as Dijkstra’s Shortest Path, Kahn’s Algorithm, and Prim’s Algorithm are based on BFS concepts. 
+
+3.  BFS is also used to detect cycles in directed and undirected graphs, find the shortest path in an unweighted graph, and solve many other graph problems.
+```
+
+`Features :`
+```bash
+1. Level-by-Level Traversal → BFS visits nodes level by level from the starting node.
+2. Uses Queue Data Structure → It uses a Queue (FIFO) to store and process nodes.
+3. Finds Shortest Path → BFS can find the shortest path in an unweighted graph.
+4. Visits Nearest Nodes First → Neighboring nodes are explored before moving to deeper nodes.
+5. Works on Different Graphs → BFS works on both directed and undirected graphs.
+6. Used in Many Applications → BFS is used in pathfinding, cycle detection, web crawling, and network routing.
+```
+`Code Implementation :`
+```bash
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from collections import deque
+
+def bfs(maze, start, goal):
+    queue = deque([(start, [])])
+    visited = set()
+    
+    while queue:
+        current, path = queue.popleft()
+        x, y = current
+        
+        if current == goal:
+            return path + [current]
+        
+        if current in visited:
+            continue
+        
+        visited.add(current)
+        
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < len(maze) and 0 <= ny < len(maze[0]) and maze[nx][ny] != 1:
+                queue.append(((nx, ny), path + [current]))
+    
+    return None
+
+def visualize_maze(maze, start, goal, path=None):
+    cmap = ListedColormap(['white', 'black', 'red', 'blue', 'green'])
+    bounds = [0, 0.5, 1.5, 2.5, 3.5, 4.5]
+    norm = plt.Normalize(bounds[0], bounds[-1])
+    
+    fig, ax = plt.subplots()
+    ax.imshow(maze, cmap=cmap, norm=norm)
+    
+    ax.scatter(start[1], start[0], color='yellow', marker='o', label='Start')
+    ax.scatter(goal[1], goal[0], color='purple', marker='o', label='Goal')
+    
+    if path:
+        for node in path[1:-1]:
+            ax.scatter(node[1], node[0], color='green', marker='o')
+    
+    ax.legend()
+    plt.show()
+
+# Example maze
+maze = np.array([
+    [0, 0, 0, 0, 0],
+    [1, 1, 0, 1, 1],
+    [0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0]
+])
+
+start = (0, 0)
+goal = (4, 4)
+
+path = bfs(maze, start, goal)
+
+visualize_maze(maze, start, goal, path)
+
+Explanation:
+1. The bfs() function finds the shortest path in a 2D maze using the Breadth-First Search (BFS) algorithm.
+- It starts from a given position and explores neighbors (up, down, left, right).
+- A queue stores positions along with the path taken.
+- A visited set prevents revisiting positions.
+- If the goal is reached, the function returns the complete path; otherwise, it returns None.
+
+2. The visualize_maze() function displays the maze and the found path using Matplotlib.
+- Different colors represent open paths, obstacles, start, goal, and the solution path.
+- imshow() displays the maze, and scatter() marks key positions.
+```
+`Advantages of Breadth First Search (BFS)`
+```bash
+1. Finds Shortest Path : BFS guarantees the shortest path in an unweighted graph.
+2. Simple to Implement : The algorithm is easy to understand and implement using a queue.
+3. Level-by-Level Traversal : It explores nodes systematically level by level.
+4. Works for Different Graphs : BFS can be used for both directed and undirected graphs.
+5. Useful in Many Applications : Used in pathfinding, social networks, web crawling, and network broadcasting.
+6. Complete Algorithm : BFS will always find a solution if one exists.
+```
+`Disadvantages of Breadth First Search (BFS)`
+```bash
+1. Uses More Memory : BFS stores many nodes in the queue, which increases memory usage.
+2. Slow for Large Graphs : It can take more time when the graph has many nodes.
+3. Not Suitable for Deep Graphs : BFS becomes inefficient if the solution is far from the start node.
+4. Explores Unnecessary Nodes : It may visit many unnecessary nodes before reaching the goal.
+5. Queue Maintenance Overhead : Managing the queue adds extra processing cost.
+```
+<br>
+
+`2. Depth-First Search (DFS) :` Depth First Search (DFS) is a graph traversal method where we start from one node and explore as far as possible along one path before going back (backtracking) and exploring another path. It works similarly to preorder traversal in a binary tree where we first completely traverse the left subtree and then move to the right subtree.
+
+- DFS uses a Stack (LIFO – Last In First Out) data structure, either directly or through recursion. In graphs, cycles may occur, so a visited array is used to avoid visiting the same node multiple times.
+<br>
+- DFS is more memory-efficient than Breadth First Search (BFS) because it stores fewer nodes at a time. However, unlike BFS, DFS does not guarantee the shortest path in a graph.
+
+`Features:`
+```bash
+1. Explores One Path Deeply : DFS travels deeply along one path before exploring another path.
+2. Uses Stack (LIFO) : DFS uses a Stack or recursion for traversal.
+3. Backtracking : When no unvisited node is found, DFS goes back to the previous node.
+4. Uses Less Memory : DFS is more memory-efficient than BFS.
+5. Visited Array Prevents Repetition : A visited array avoids visiting the same node multiple times.
+6. Does Not Guarantee Shortest Path : DFS may not always find the shortest path in a graph.
+```
+
+`Code Implementation:`
+```bash
+def visualize_maze(maze, start, goal, path=None):
+    cmap = ListedColormap(['white', 'black', 'red', 'blue', 'green'])
+    bounds = [0, 0.5, 1.5, 2.5, 3.5, 4.5]
+    norm = plt.Normalize(bounds[0], bounds[-1])
+    
+    fig, ax = plt.subplots()
+    ax.imshow(maze, cmap=cmap, norm=norm)
+    
+    ax.scatter(start[1], start[0], color='yellow', marker='o', label='Start')
+    ax.scatter(goal[1], goal[0], color='purple', marker='o', label='Goal')
+    
+    if path:
+        for node in path[1:-1]:
+            ax.scatter(node[1], node[0], color='green', marker='o')
+    
+    ax.legend()
+    plt.show()
+
+def dfs(maze, start, goal):
+    stack = [(start, [])]
+    visited = set()
+    
+    while stack:
+        current, path = stack.pop()
+        x, y = current
+        
+        if current == goal:
+            return path + [current]
+        
+        if current in visited:
+            continue
+        
+        visited.add(current)
+        
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < len(maze) and 0 <= ny < len(maze[0]) and maze[nx][ny] != 1:
+                stack.append(((nx, ny), path + [current]))
+    
+    return None
+
+# Example maze
+maze = np.array([
+    [0, 0, 0, 0, 0],
+    [1, 1, 0, 1, 1],
+    [0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0]
+])
+
+start = (0, 0)
+goal = (4, 4)
+
+path = dfs(maze, start, goal)
+
+visualize_maze(maze, start, goal, path)
+
+Explanation:
+1. The dfs() function finds a path in a 2D maze using the Depth-First Search (DFS) algorithm.
+- It starts from a given position and explores neighbors (up, down, left, right).
+- A stack stores positions along with the path taken.
+- A visitedset prevents revisiting positions.
+- If the goal is reached, the function returns the complete path; otherwise, it returns None.
+
+2. The visualize_maze() function displays the maze and the found path using Matplotlib.
+- Different colors represent open paths, obstacles, start, goal, and the solution path.
+- imshow() displays the maze, and scatter() marks key positions.
+```
+
+`Advantages of Depth First Search (DFS)`
+```bash
+1. Uses Less Memory : DFS stores fewer nodes compared to BFS, so it is memory-efficient.
+2. Simple to Implement : DFS can be easily implemented using recursion or a stack.
+3. Good for Deep Graphs : DFS works well when the solution is far from the starting node.
+4. Useful for Many Problems : DFS is used in cycle detection, maze solving, pathfinding, and topological sorting.
+5. Backtracking Support : DFS naturally supports backtracking while exploring paths.
+6. Fast for Some Traversals : It may reach the goal quickly without exploring all neighboring nodes.
+```
+
+`Disadvantages of Depth First Search (DFS)`
+```bash
+1. Does Not Guarantee Shortest Path : DFS may not find the shortest path in a graph.
+2. Can Get Stuck in Deep Paths : DFS may spend too much time exploring a long path before checking others.
+3. May Visit Unnecessary Nodes : It can explore irrelevant paths before reaching the solution.
+4. Stack Overflow Risk : Recursive DFS may cause stack overflow for very large graphs.
+5. Not Always Optimal : DFS is not suitable when the shortest or minimum-cost path is required.
+```
