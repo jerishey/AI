@@ -472,3 +472,12 @@ Explanation:
 4. Stack Overflow Risk : Recursive DFS may cause stack overflow for very large graphs.
 5. Not Always Optimal : DFS is not suitable when the shortest or minimum-cost path is required.
 ```
+
+`Applications of Uninformed Search Algorithm`
+```bash
+1. Pathfinding: Used in navigation systems and robotics to find the shortest route between locations. BFS and DFS explore the map to determine the optimal path.
+2. Puzzle Solving: Applied in problems like the Eight Puzzle or Fifteen Puzzle to determine a sequence of moves leading to a solution.
+3. Game AI: Helps in exploring game trees to find winning strategies. BFS and DFS are often combined with minimax or alpha-beta pruning for efficiency.
+4. Robot Navigation: Assists robots in path planning by exploring environments and identifying the best route while avoiding obstacles.
+5. Web Crawling: BFS is widely used in web crawlers to systematically visit and index web pages by following links.
+```
