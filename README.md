@@ -481,3 +481,331 @@ Explanation:
 4. Robot Navigation: Assists robots in path planning by exploring environments and identifying the best route while avoiding obstacles.
 5. Web Crawling: BFS is widely used in web crawlers to systematically visit and index web pages by following links.
 ```
+### `Informed Search Algorithms`
+Informed search algorithms in AI are search methods that use extra knowledge, called heuristics, to prioritize which paths to explore. By estimating how close each possible step is to the goal, these algorithms can find solutions more quickly and efficiently than uninformed or “blind,” search. They are widely used in AI for tasks like pathfinding and puzzle solving because they help navigate large, complex search spaces.
+
+`Features`
+```bash
+1. Uses Heuristics – Uses heuristic information to estimate the best path to the goal.
+2. Goal-Oriented – Searches toward the target node instead of exploring every possible path.
+3. Faster Search – Reduces search time by selecting the most promising nodes first.
+4. Efficient Node Exploration – Explores fewer unnecessary nodes compared to uninformed search.
+5. Intelligent Decision Making – Makes smart decisions using additional problem knowledge.
+6. Better Performance – Provides efficient solutions for complex AI problems like robotics and navigation.
+```
+
+`1. Greedy Best-First Search :` Greedy Best-First Search is an AI search algorithm that selects the most promising path using a heuristic function. It expands the node that appears closest to the goal, without considering the actual shortest path cost. The process continues until the goal is reached.
+
+`How Greedy Best-First Search Works?`
+```bash
+1. Greedy Best-First Search works by evaluating the cost of each possible path and then expanding the path with the lowest cost. This process is repeated until the goal is reached. 
+
+2. The algorithm uses a heuristic function to determine which path is the most promising. 
+
+3. The heuristic function takes into account the cost of the current path and the estimated cost of the remaining paths. 
+
+4. If the cost of the current path is lower than the estimated cost of the remaining paths, then the current path is chosen. This process is repeated until the goal is reached.
+```
+
+`Code Implementation`
+```bash
+In the code:
+
+1. A priority queue (min-heap) is used to always pick the cell that looks closest to the goal (based only on heuristic distance).
+2. It tracks where each cell came from (came_from) to reconstruct the path at the end.
+3. It expands neighbors only if they are valid, not walls and not visited before.
+4. When the goal is reached, the path is reconstructed backwards.
+``` 
+<b>`Example`</b>
+```bash
+import heapq
+
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def greedy_best_first_search(maze, start, end):
+    open_list = []
+    heapq.heappush(open_list, (heuristic(start, end), start))
+    came_from = {start: None}
+    visited = set()
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    while open_list:
+        _, current = heapq.heappop(open_list)
+        if current == end:
+            path = []
+            while current:
+                path.append(current)
+                current = came_from[current]
+            return path[::-1]
+        visited.add(current)
+        for dx, dy in directions:
+            neighbor = (current[0] + dx, current[1] + dy)
+            if (0 <= neighbor[0] < len(maze) and 0 <= neighbor[1] < len(maze[0]) and
+                    maze[neighbor[0]][neighbor[1]] == 0 and neighbor not in visited):
+                visited.add(neighbor)
+                came_from[neighbor] = current
+                heapq.heappush(open_list, (heuristic(neighbor, end), neighbor))
+    return None
+
+path = greedy_best_first_search(maze, start, end)
+print("Greedy Best-First path:", path)
+```
+<br>
+
+`Advantages of Greedy Best-First Search`
+```bash
+1. Simple to Implement – Greedy Best-First Search is easy to understand and implement.
+2. Fast and Efficient – It quickly finds a solution by selecting the most promising path.
+3. Low Memory Usage – The algorithm requires less memory compared to many other search algorithms.
+4. Flexible – It can be adapted for different types of problems.
+5. Efficient with Good Heuristics – A good heuristic function helps the algorithm find solutions quickly, even in large search spaces.
+```
+
+`Disadvantages of Greedy Best-First Search`
+```bash
+1. Inaccurate Results – It does not always find the optimal solution because it only chooses the most promising path.
+2. Local Optima Problem – The algorithm may get stuck in a local optimum instead of finding the best path.
+3. Requires Heuristic Function – It depends on a heuristic function, which increases algorithm complexity.
+4. Not Complete – It may fail to find a solution in very complex search spaces or cycles.
+```
+
+`Applications of Greedy Best-First Search`
+```bash
+1. Pathfinding: Greedy Best-First Search is used to find the shortest path between two points in a graph. It is used in many applications such as video games, robotics, and navigation systems.
+
+2. Machine Learning: Greedy Best-First Search can be used in machine learning algorithms to find the most promising path through a search space.
+
+3. Optimization: Greedy Best-First Search can be used to optimize the parameters of a system in order to achieve the desired result.
+
+4. Game AI: Greedy Best-First Search can be used in game AI to evaluate potential moves and chose the best one.
+
+5. Navigation: Greedy Best-First Search can be use to navigate to find the shortest path between two locations.
+
+6. Natural Language Processing: Greedy Best-First Search can be use in natural language processing tasks such as language translation or speech recognisation to generate the most likely sequence of words.
+
+7. Image Processing: Greedy Best-First Search can be use in image processing to segment image into regions of interest.
+```
+
+`2. A* Search Algorithm :` A* Search Algorithm is an informed search algorithm that finds the shortest path between a start node and a goal node using both actual path cost and heuristic cost. It selects the path with the lowest estimated total cost.
+```bash
+f(n)=g(n)+h(n)
+
+Parameter:
+
+g(n) = actual cost from start node
+h(n) = estimated cost to goal
+f(n) = total estimated cost
+```
+`Features`
+```bash
+1. Uses Heuristic Function – A* uses a heuristic function to estimate the distance between the current node and the goal node.
+2. Optimal Solution – A* guarantees the shortest path when the heuristic function is admissible.
+3. Complete Algorithm – The algorithm always finds a solution if one exists.
+4. Efficient Search – A* reduces unnecessary node exploration by selecting the most promising path.
+5. Combines Cost Functions – It uses both actual path cost and estimated cost for decision making.
+
+f(n)=g(n)+h(n)
+
+6. Goal-Oriented Search – The algorithm searches toward the target node efficiently.
+7. Widely Used – A* is commonly used in robotics, games, maps, and navigation systems.
+```
+`Code Implementation`
+```bash
+import math
+import heapq
+
+# Define the Cell class
+class Cell:
+    def __init__(self):
+        self.parent_i = 0  # Parent cell's row index
+        self.parent_j = 0  # Parent cell's column index
+        self.f = float('inf')  # Total cost of the cell (g + h)
+        self.g = float('inf')  # Cost from start to this cell
+        self.h = 0  # Heuristic cost from this cell to destination
+
+# Define the size of the grid
+ROW = 9
+COL = 10
+
+# Check if a cell is valid (within the grid)
+def is_valid(row, col):
+    return (row >= 0) and (row < ROW) and (col >= 0) and (col < COL)
+
+# Check if a cell is unblocked
+def is_unblocked(grid, row, col):
+    return grid[row][col] == 1
+
+# Check if a cell is the destination
+def is_destination(row, col, dest):
+    return row == dest[0] and col == dest[1]
+
+# Calculate the heuristic value of a cell (Euclidean distance to destination)
+def calculate_h_value(row, col, dest):
+    return ((row - dest[0]) ** 2 + (col - dest[1]) ** 2) ** 0.5
+
+# Trace the path from source to destination
+def trace_path(cell_details, dest):
+    print("The Path is ")
+    path = []
+    row = dest[0]
+    col = dest[1]
+
+    # Trace the path from destination to source using parent cells
+    while not (cell_details[row][col].parent_i == row and cell_details[row][col].parent_j == col):
+        path.append((row, col))
+        temp_row = cell_details[row][col].parent_i
+        temp_col = cell_details[row][col].parent_j
+        row = temp_row
+        col = temp_col
+
+    # Add the source cell to the path
+    path.append((row, col))
+    # Reverse the path to get the path from source to destination
+    path.reverse()
+
+    # Print the path
+    for i in path:
+        print("->", i, end=" ")
+    print()
+
+# Implement the A* search algorithm
+def a_star_search(grid, src, dest):
+    # Check if the source and destination are valid
+    if not is_valid(src[0], src[1]) or not is_valid(dest[0], dest[1]):
+        print("Source or destination is invalid")
+        return
+
+    # Check if the source and destination are unblocked
+    if not is_unblocked(grid, src[0], src[1]) or not is_unblocked(grid, dest[0], dest[1]):
+        print("Source or the destination is blocked")
+        return
+
+    # Check if we are already at the destination
+    if is_destination(src[0], src[1], dest):
+        print("We are already at the destination")
+        return
+
+    # Initialize the closed list (visited cells)
+    closed_list = [[False for _ in range(COL)] for _ in range(ROW)]
+    # Initialize the details of each cell
+    cell_details = [[Cell() for _ in range(COL)] for _ in range(ROW)]
+
+    # Initialize the start cell details
+    i = src[0]
+    j = src[1]
+    cell_details[i][j].f = 0
+    cell_details[i][j].g = 0
+    cell_details[i][j].h = 0
+    cell_details[i][j].parent_i = i
+    cell_details[i][j].parent_j = j
+
+    # Initialize the open list (cells to be visited) with the start cell
+    open_list = []
+    heapq.heappush(open_list, (0.0, i, j))
+
+    # Initialize the flag for whether destination is found
+    found_dest = False
+
+    # Main loop of A* search algorithm
+    while len(open_list) > 0:
+        # Pop the cell with the smallest f value from the open list
+        p = heapq.heappop(open_list)
+
+        # Mark the cell as visited
+        i = p[1]
+        j = p[2]
+        closed_list[i][j] = True
+
+        # For each direction, check the successors
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        for dir in directions:
+            new_i = i + dir[0]
+            new_j = j + dir[1]
+
+            # If the successor is valid, unblocked, and not visited
+            if is_valid(new_i, new_j) and is_unblocked(grid, new_i, new_j) and not closed_list[new_i][new_j]:
+                # If the successor is the destination
+                if is_destination(new_i, new_j, dest):
+                    # Set the parent of the destination cell
+                    cell_details[new_i][new_j].parent_i = i
+                    cell_details[new_i][new_j].parent_j = j
+                    print("The destination cell is found")
+                    # Trace and print the path from source to destination
+                    trace_path(cell_details, dest)
+                    found_dest = True
+                    return
+                else:
+                    # Calculate the new f, g, and h values
+                    g_new = cell_details[i][j].g + 1.0
+                    h_new = calculate_h_value(new_i, new_j, dest)
+                    f_new = g_new + h_new
+
+                    # If the cell is not in the open list or the new f value is smaller
+                    if cell_details[new_i][new_j].f == float('inf') or cell_details[new_i][new_j].f > f_new:
+                        # Add the cell to the open list
+                        heapq.heappush(open_list, (f_new, new_i, new_j))
+                        # Update the cell details
+                        cell_details[new_i][new_j].f = f_new
+                        cell_details[new_i][new_j].g = g_new
+                        cell_details[new_i][new_j].h = h_new
+                        cell_details[new_i][new_j].parent_i = i
+                        cell_details[new_i][new_j].parent_j = j
+
+    # If the destination is not found after visiting all cells
+    if not found_dest:
+        print("Failed to find the destination cell")
+
+def main():
+    # Define the grid (1 for unblocked, 0 for blocked)
+    grid = [
+        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+        [1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+        [1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
+        [0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+        [1, 1, 1, 0, 1, 1, 1, 0, 1, 0],
+        [1, 0, 1, 1, 1, 1, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+        [1, 1, 1, 0, 0, 0, 1, 0, 0, 1]
+    ]
+
+    # Define the source and destination
+    src = [8, 0]
+    dest = [0, 0]
+
+    # Run the A* search algorithm
+    a_star_search(grid, src, dest)
+
+if __name__ == "__main__":
+    main()
+```
+<br>
+
+`Advantages of A* Search Algorithm`
+```bash
+1. Finds Optimal Path – A* guarantees the shortest path when the heuristic is accurate.
+2. Complete Algorithm – It always finds a solution if one exists.
+3. Efficient Search – Reduces unnecessary node exploration using heuristic information.
+4. Flexible – Can be used in different types of search and pathfinding problems.
+5. Widely Used – Suitable for robotics, games, and navigation systems.
+```
+
+`Disadvantages of A* Search Algorithm`
+```bash
+1. High Memory Usage – A* stores many nodes in memory during searching.
+2. Complex Implementation – More difficult to implement than simple search algorithms.
+3. Heuristic Dependent – Performance depends on the quality of the heuristic function.
+4. Slow for Large Search Spaces – Can become slow when the search space is very large.
+5. Computational Cost – Requires more processing time compared to simpler algorithms.
+```
+
+`Applications of A* Search Algorithm`
+```bash
+1. Pathfinding – Used to find shortest paths in maps and graphs.
+2. Navigation Systems – Used in GPS and route planning applications.
+3. Game Development – Helps game characters move intelligently.
+4. Robotics – Used for robot movement and obstacle avoidance.
+5. Network Routing – Helps in finding efficient network paths.
+6. Artificial Intelligence – Applied in problem-solving and decision-making systems.
+7. Maze Solving – Used to find solutions in maze and puzzle problems.
+```
